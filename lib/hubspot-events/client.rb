@@ -48,7 +48,25 @@ module HubspotEvents
       request["Authorization"] = "Bearer #{@api_token}"
       request.body = attributes.to_json
 
-      http.request(request)
+      response = http.request(request)
+      handle_json_response(response)
+    end
+
+    def handle_json_response(response)
+      case response.code.to_i
+      when 200, 201, 202, 204
+        Utils.symbolize_keys(JSON.load(response.body))
+      when 401
+        raise AuthenticationError, response
+      when 406
+        raise UnsupportedFormatRequestedError, response
+      when 422
+        raise ResourceValidationError, response
+      when 503
+        raise ServiceUnavailableError, response
+      else
+        raise GeneralAPIError, response
+      end
     end
   end
 end
