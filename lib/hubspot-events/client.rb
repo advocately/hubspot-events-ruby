@@ -26,7 +26,7 @@ module HubspotEvents
         id: "#{@app_id}-#{SecureRandom.urlsafe_base64(16)}",
         email: email,
         name: name,
-        timestamp: attributes.delete(:occurred_at),
+        timestamp: attributes[:occurred_at],
         eventTypeId: event_type_id
       }
       body.merge!(attributes)
